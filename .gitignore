@@ -71,3 +71,9 @@ typings/
 
 # Serverless directories
 .serverless
+
+# Compiled app
+dist
+
+# IDE specific settings
+.vscode

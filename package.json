@@ -5,43 +5,41 @@
   "author": "Michael Penrod",
   "license": "MIT",
   "scripts": {
-    "format": "prettier --write \"**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:dev": "nodemon",
-    "prestart:prod": "rm -rf dist && tsc",
-    "start:prod": "node dist/main.js",
-    "start:hmr": "node dist/server",
+    "start": "node dist/main.js",
     "test": "jest",
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "webpack": "webpack --config webpack.config.js"
+    "nodemon": "nodemon",
+    "tsc": "tsc --watch",
+    "tslint": "npm run tslint:src && npm run tslint:test",
+    "tslint:src": "tslint src/**/*.ts",
+    "tslint:test": "tslint test/**/*.ts"
   },
   "dependencies": {
-    "@nestjs/common": "^5.0.0",
-    "@nestjs/core": "^5.0.0",
+    "@nestjs/common": "^5.3.6",
+    "@nestjs/core": "^5.3.6",
+    "body-parser": "^1.18.3",
     "fastify-formbody": "^2.0.0",
+    "morgan": "^1.9.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.0.0",
     "typescript": "^2.6.2"
   },
   "devDependencies": {
-    "@nestjs/testing": "^5.0.0",
+    "@nestjs/testing": "^5.3.1",
     "@types/express": "^4.0.39",
     "@types/jest": "^21.1.8",
+    "@types/morgan": "^1.7.35",
     "@types/node": "^9.3.0",
     "@types/supertest": "^2.0.4",
     "jest": "^21.2.1",
     "nodemon": "^1.14.1",
-    "prettier": "^1.11.1",
     "supertest": "^3.0.0",
     "ts-jest": "^21.2.4",
     "ts-loader": "^4.1.0",
     "ts-node": "^4.1.0",
     "tsconfig-paths": "^3.1.1",
-    "tslint": "5.3.2",
-    "webpack": "^4.2.0",
-    "webpack-cli": "^2.0.13",
-    "webpack-node-externals": "^1.6.0"
+    "tslint": "5.3.2"
   },
   "jest": {
     "moduleFileExtensions": [
@@ -50,7 +48,7 @@
       "ts"
     ],
     "rootDir": "src",
-    "testRegex": ".spec.ts$",
+    "testRegex": ".(spec|test).ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
