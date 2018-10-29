@@ -5,6 +5,7 @@
   "author": "Michael Penrod",
   "license": "MIT",
   "scripts": {
+    "postinstall": "tsc",
     "start": "node dist/main.js",
     "test": "jest",
     "test:cov": "jest --coverage",
