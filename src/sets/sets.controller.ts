@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, Patch, Get, Delete, Param, HttpCode } from '@nestjs/common';
 import { JsonApiDocumentPipe } from '../pipes/JsonApiDocumentPipe';
 import { Set } from '../models/Set';
 import { RequestObject } from '../models/RequestObject';
@@ -16,7 +16,14 @@ export class SetsController {
 
 	@Patch(':id')
 	@UsePipes(JsonApiDocumentPipe)
-	softUpdate(@Body() body: RequestObject<Set>) {
+	patchUpdate(@Body() body: RequestObject<Set>) {
 		return serializeToJsonApi(body.model, body.type);
+	}
+
+	@Delete(':id')
+	@HttpCode(204)
+	delete(@Param('id') id: string) {
+		console.log('Deleting Set =>', id);
+		return;
 	}
 }
