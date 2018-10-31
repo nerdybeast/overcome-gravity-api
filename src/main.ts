@@ -2,10 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import bodyParser from 'body-parser';
 import morgan from 'morgan';
+import { ConfigService } from './config/config.service';
+import { ConfigModule } from './config/config.module';
 
 async function bootstrap() {
 
 	const app = await NestFactory.create(AppModule);
+	const configService = app.select(ConfigModule).get(ConfigService);
 
 	//https://www.npmjs.com/package/body-parser#bodyparserjsonoptions
 	app.use(bodyParser.json({
@@ -18,7 +21,7 @@ async function bootstrap() {
 	app.enableCors();
 	
 	//TODO: Config this port number
-	await app.listen(process.env.PORT || 3000);
+	await app.listen(configService.get('PORT'));
 }
 
 bootstrap();
