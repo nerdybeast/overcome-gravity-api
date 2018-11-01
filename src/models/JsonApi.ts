@@ -1,5 +1,4 @@
-// import { DocumentBase } from './DocumentBase';
-import { IModelBase } from './IModelBase';
+import { isArray } from 'util';
 
 export class JsonApiDto<T> {
 
@@ -31,16 +30,43 @@ export class Document<T> extends DocumentBase {
 	attributes: T;
 }
 
-export function serializeToJsonApi(model: any, type: string, idProperty: string = 'id') : any {
+export function serializeToJsonApi(models: any|any[], type: string, idProperty: string = 'id') : any {
+
+	let documents: any = null;
+
+	if(!isArray(models)) {
+
+		documents = createDocument(models, type, idProperty);
+
+	} else {
+
+		documents = models.map(model => {
+	
+			const id = model[idProperty];
+	
+			//The "model" in this context ends up being the "attributes" key in the payload which can't have "id" as a property
+			//because this property needs to be a level higher in the json api document.
+			if(idProperty === 'id') delete model[idProperty];
+	
+			return new Document(id, type, model);
+		});
+
+	}
+
+	const jsonApiDto = new JsonApiDto(documents);
+
+	return jsonApiDto;
+}
+
+function createDocument<T>(model: any, type: string, idProperty: string) : Document<T> {
 
 	const id = model[idProperty];
 
+	//The "model" in this context ends up being the "attributes" key in the payload which can't have "id" as a property
+	//because this property needs to be a level higher in the json api document.
 	if(idProperty === 'id') delete model[idProperty];
 
-	const document = new Document(id, type, model);
-	const jsonApiDto = new JsonApiDto(document);
-
-	return jsonApiDto;
+	return new Document(id, type, model);
 }
 
 /**

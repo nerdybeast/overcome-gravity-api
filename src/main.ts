@@ -21,7 +21,7 @@ async function bootstrap() {
 	app.enableCors();
 	
 	//TODO: Config this port number
-	await app.listen(configService.get('PORT'));
+	await app.listen(configService.PORT);
 }
 
 bootstrap();

@@ -4,7 +4,10 @@ import { ConfigService } from './config.service';
 @Module({
 	providers: [{
 		provide: ConfigService,
-		useClass: ConfigService
+		useFactory: () => {
+			const { PORT, MONGODB_URI } = process.env;
+			return new ConfigService({ PORT, MONGODB_URI });
+		}
 	}],
 	exports: [ConfigService]
 })
