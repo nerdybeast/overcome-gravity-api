@@ -1,56 +1,51 @@
 import { isArray } from 'util';
+import { ModelBase } from './ModelBase';
+import clone from 'lodash.clonedeep';
 
-export class JsonApiDto<T> {
+export class JsonApiDto {
 
-	constructor(data?: Document<T> | Document<T>[]) {
+	constructor(data?: Document | Document[]) {
 		this.data = data;
+		this.included = [];
 	}
 
-	data: Document<T> | Document<T>[];
+	public data: Document | Document[];
+	public included: Document[];
+}
+
+export class JsonApiRelationshipDto {
+	constructor(
+		public data: DocumentBase|DocumentBase[]
+	) {}
 }
 
 export class DocumentBase {
-
-	constructor(id?: string, type?: string) {
-		this.id = id;
-		this.type = type;
-	}
-
-	id: string;
-	type: string;
+	constructor(
+		public id: string,
+		public type: string
+	) {}
 }
 
-export class Document<T> extends DocumentBase {
+export class Document extends DocumentBase {
 
-	constructor(id: string, type: string, attributes: T) {
+	constructor(id: string, type: string, attributes: any) {
 		super(id, type);
 		this.attributes = attributes;
+		this.relationships = {};
 	}
 
-	attributes: T;
+	public attributes: any;
+	public relationships: {[key: string]: JsonApiRelationshipDto|JsonApiRelationshipDto[]};
 }
 
-export function serializeToJsonApi(models: any|any[], type: string, idProperty: string = 'id') : any {
+export function serializeToJsonApi<T extends ModelBase>(models: T|T[], type: string) : JsonApiDto {
 
-	let documents: any = null;
+	let documents: Document|Document[] = null;
 
 	if(!isArray(models)) {
-
-		documents = createDocument(models, type, idProperty);
-
+		documents = createDocument(models, type);
 	} else {
-
-		documents = models.map(model => {
-	
-			const id = model[idProperty];
-	
-			//The "model" in this context ends up being the "attributes" key in the payload which can't have "id" as a property
-			//because this property needs to be a level higher in the json api document.
-			if(idProperty === 'id') delete model[idProperty];
-	
-			return new Document(id, type, model);
-		});
-
+		documents = models.map(model => createDocument(model, type));
 	}
 
 	const jsonApiDto = new JsonApiDto(documents);
@@ -58,15 +53,71 @@ export function serializeToJsonApi(models: any|any[], type: string, idProperty: 
 	return jsonApiDto;
 }
 
-function createDocument<T>(model: any, type: string, idProperty: string) : Document<T> {
+/**
+ * Creates a new json api document where the given model extends ModelBase meaning it must have an "id" property.
+ * @param model 
+ * @param type 
+ * @param idProperty 
+ */
+export function createDocument<T extends ModelBase>(model: T, type: string) : Document {
 
-	const id = model[idProperty];
+	//Capture the id property before we delete it.
+	const id = model.id;
 
 	//The "model" in this context ends up being the "attributes" key in the payload which can't have "id" as a property
 	//because this property needs to be a level higher in the json api document.
-	if(idProperty === 'id') delete model[idProperty];
+	delete model.id;
 
-	return new Document(id, type, model);
+	const document = new Document(id, type, model);
+
+	return document;
+}
+
+export class Relationships {
+	/**
+	 * 
+	 * @param name The name of the property on the original object for this relationship.
+	 * @param type The type that needs to be set in the json for the json api standard.
+	 * @param data 
+	 */
+	constructor(
+		public name: string,
+		public type: string,
+		public data: ModelBase|ModelBase[]
+	) {}
+}
+
+export function createDocument2<T extends ModelBase>(model: T, type: string, relationships: Relationships[] = []) : Document {
+
+	model = clone(model);
+
+	//Capture the id property before we delete it.
+	const id = model.id;
+
+	//The "model" in this context ends up being the "attributes" key in the payload which can't have "id" as a property
+	//because this property needs to be a level higher in the json api document.
+	delete model.id;
+
+	const document = new Document(id, type, model);
+
+	relationships.forEach(relationship => {
+		if(isArray(relationship.data)) {
+
+			const models = (relationship.data as ModelBase[]).map(x => new DocumentBase(x.id, relationship.type));
+			document.relationships[relationship.name] = new JsonApiRelationshipDto(models);
+
+		} else {
+
+			const model = relationship.data as ModelBase;
+
+			if(model) {
+				const doc = new DocumentBase(model.id, relationship.type);
+				document.relationships[relationship.name] = new JsonApiRelationshipDto(doc);
+			}
+		}
+	});
+
+	return document;
 }
 
 /**

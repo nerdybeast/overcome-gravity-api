@@ -6,6 +6,9 @@ export class Exercise extends ModelBase {
 	order: number;
 	type: string;
 
-	//This will be the id of the workout this exercise belongs to
+	//Will be the workout id
 	workout: string;
+
+	//Will be the max id
+	max: string;
 }

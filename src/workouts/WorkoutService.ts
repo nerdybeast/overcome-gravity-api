@@ -7,18 +7,31 @@ import { Workout } from '../models/Workout';
 @Injectable()
 export class WorkoutService {
 
-	constructor(@InjectModel('Workout') private readonly workoutModel: Model<IWorkoutDocument>) {}
+	constructor(
+		@InjectModel('Workout') private readonly workoutModel: Model<IWorkoutDocument>
+	) {}
 
 	public async create(userId: string, workout: Workout) : Promise<Workout> {
 		const workoutDocument = this.toWorkoutDocument(userId, workout);
 		const createdWorkoutModel = new this.workoutModel(workoutDocument);
 		const result = await createdWorkoutModel.save();
-		return this.fromMaxDocument(result);
+		return this.fromWorkoutDocument(result);
 	}
 
 	public async findByUser(userId: string) : Promise<Workout[]> {
 		const workoutDocuments = await this.workoutModel.find({ userId }).exec();
-		return workoutDocuments.map(workoutDocument => this.fromMaxDocument(workoutDocument));
+		const workouts = workoutDocuments.map(workoutDocument => this.fromWorkoutDocument(workoutDocument));
+		return workouts;
+	}
+
+	public async update(workout: Workout) : Promise<Workout> {
+
+		const workoutDocument = await this.workoutModel.findByIdAndUpdate(workout.id, workout, {
+			//Returns the modified document instead of the original
+			new: true
+		});
+
+		return this.fromWorkoutDocument(workoutDocument);
 	}
 
 	private toWorkoutDocument(userId: string, workout: Workout) : IWorkoutDocument {
@@ -29,7 +42,7 @@ export class WorkoutService {
 		});
 	}
 
-	private fromMaxDocument(workoutDocument: IWorkoutDocument) : Workout {
+	private fromWorkoutDocument(workoutDocument: IWorkoutDocument) : Workout {
 		const workout = new Workout();
 		workout.id = workoutDocument.id;
 		workout.clientId = workoutDocument.clientId;

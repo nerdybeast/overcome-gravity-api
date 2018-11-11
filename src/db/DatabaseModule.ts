@@ -4,6 +4,8 @@ import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
 import { MaxSchema } from './schemas/MaxSchema';
 import { WorkoutSchema } from './schemas/WorkoutSchema';
+import { ExerciseSchema } from './schemas/ExerciseSchema';
+import { SetSchema } from './schemas/SetSchema';
 
 const BaseDBModule = MongooseModule.forRootAsync({
 	imports: [ConfigModule],
@@ -26,6 +28,12 @@ const BaseDBModule = MongooseModule.forRootAsync({
 		}, {
 			name: 'Workout',
 			schema: WorkoutSchema
+		}, {
+			name: 'Exercise',
+			schema: ExerciseSchema
+		}, {
+			name: 'Set',
+			schema: SetSchema
 		}])
 	]
 })
