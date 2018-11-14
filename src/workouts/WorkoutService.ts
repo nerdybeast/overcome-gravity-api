@@ -18,6 +18,11 @@ export class WorkoutService {
 		return this.fromWorkoutDocument(result);
 	}
 
+	public async findById(id: string) : Promise<Workout> {
+		const workoutDocument = await this.workoutModel.findById(id);
+		return this.fromWorkoutDocument(workoutDocument);
+	}
+
 	public async findByUser(userId: string) : Promise<Workout[]> {
 		const workoutDocuments = await this.workoutModel.find({ userId }).exec();
 		const workouts = workoutDocuments.map(workoutDocument => this.fromWorkoutDocument(workoutDocument));
