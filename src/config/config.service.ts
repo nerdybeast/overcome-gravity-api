@@ -17,11 +17,16 @@ export class ConfigService {
 		return this.environmentConfig.MONGODB_URI;
 	}
 
+	get ROLLBAR_ACCESS_TOKEN() : string {
+		return this.environmentConfig.ROLLBAR_ACCESS_TOKEN;
+	}
+
 	private validateEnvConfig(env: any) : EnvironmentConfig {
 
 		const envVarsSchema: Joi.ObjectSchema = Joi.object({
 			PORT: Joi.number().required(),
-			MONGODB_URI: Joi.string().required()
+			MONGODB_URI: Joi.string().required(),
+			ROLLBAR_ACCESS_TOKEN: Joi.string().required()
 		});
 
 		const { error, value: validatedEnvConfig } = Joi.validate<EnvironmentConfig>(env, envVarsSchema);

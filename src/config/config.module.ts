@@ -5,8 +5,8 @@ import { ConfigService } from './config.service';
 	providers: [{
 		provide: ConfigService,
 		useFactory: () => {
-			const { PORT, MONGODB_URI } = process.env;
-			return new ConfigService({ PORT, MONGODB_URI });
+			const { PORT, MONGODB_URI, ROLLBAR_ACCESS_TOKEN } = process.env;
+			return new ConfigService({ PORT, MONGODB_URI, ROLLBAR_ACCESS_TOKEN });
 		}
 	}],
 	exports: [ConfigService]

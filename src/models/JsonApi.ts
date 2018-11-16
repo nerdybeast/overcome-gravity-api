@@ -87,6 +87,15 @@ export class Relationships {
 	) {}
 }
 
+export class JsonApiErrorResponse {
+	public errors: JsonApiError[] = [];
+}
+
+export class JsonApiError {
+	public title: string;
+	public details: string;
+}
+
 export function createDocument2<T extends ModelBase>(model: T, type: string, relationships: Relationships[] = []) : Document {
 
 	model = clone(model);

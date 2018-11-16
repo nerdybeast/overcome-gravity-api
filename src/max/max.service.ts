@@ -21,6 +21,16 @@ export class MaxService {
 		return results.map(x => this.fromMaxDocument(x));
 	}
 
+	public async update(max: Max) : Promise<Max> {
+
+		const maxDocument = await this.maxModel.findByIdAndUpdate(max.id, max, {
+			//Returns the modified document instead of the original
+			new: true
+		});
+
+		return this.fromMaxDocument(maxDocument);
+	}
+
 	private toMaxDocument(userId: string, max: Max) : IMaxDocument {
 		return new this.maxModel({
 			userId,
