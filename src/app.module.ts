@@ -10,6 +10,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionHandler } from './exception-handlers/GlobalExceptionHandler';
 import { UncaughtHttpExceptionHandler } from './exception-handlers/UncaughtHttpExceptionHandler';
 import { LoggingModule } from './LoggingModule';
+import { PreferencesModule } from './preferences/PreferencesModule';
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { LoggingModule } from './LoggingModule';
 		MaxModule,
 		ExercisesModule,
 		LoggingModule,
+		PreferencesModule,
 
 		//Gives access via dependency injection to the ConfigService
 		ConfigModule

@@ -11,9 +11,17 @@ export class SetsService {
 
 	public async create(set: Set) : Promise<Set> {
 		const setDocument = this.toSetDocument(set);
-		const createdSetModel = new this.setModel(setDocument);
-		const result = await createdSetModel.save();
+		const result = await setDocument.save();
 		return this.fromSetDocument(result);
+	}
+
+	public async findById(id: string) : Promise<Set> {
+		const theSet = await this.setModel.findById(id);
+		return this.fromSetDocument(theSet);
+	}
+
+	public async findByExercise(exerciseId: string) : Promise<Set[]> {
+		return this.findByExercises([exerciseId]);
 	}
 
 	public async findByExercises(exerciseIds: string[]) : Promise<Set[]> {
@@ -39,6 +47,12 @@ export class SetsService {
 
 	public async delete(id: string) {
 		await this.setModel.findByIdAndDelete(id).exec();
+	}
+
+	public async deleteMany(setIds: string[]) {
+		return await this.setModel.deleteMany({
+			_id: { $in: setIds }
+		}).exec();
 	}
 
 	private toSetDocument(set: Set) : ISetDocument {

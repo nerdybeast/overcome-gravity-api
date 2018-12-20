@@ -11,8 +11,7 @@ export class ExerciseService {
 
 	public async create(exercise: Exercise) : Promise<Exercise> {
 		const exerciseDocument = this.toExerciseDocument(exercise);
-		const createdExerciseModel = new this.exerciseModel(exerciseDocument);
-		const result = await createdExerciseModel.save();
+		const result = await exerciseDocument.save();
 		return this.fromExerciseDocument(result);
 	}
 
@@ -39,6 +38,16 @@ export class ExerciseService {
 		});
 
 		return this.fromExerciseDocument(exerciseDocument);
+	}
+
+	public async delete(exerciseId: string) {
+		return await this.exerciseModel.findByIdAndDelete(exerciseId);
+	}
+
+	public async deleteMany(exerciseIds: string[]) {
+		return await this.exerciseModel.deleteMany({
+			_id: { $in: exerciseIds }
+		}).exec();
 	}
 
 	private toExerciseDocument(exercise: Exercise) : IExerciseDocument {

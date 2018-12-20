@@ -6,6 +6,7 @@ import { MaxSchema } from './schemas/MaxSchema';
 import { WorkoutSchema } from './schemas/WorkoutSchema';
 import { ExerciseSchema } from './schemas/ExerciseSchema';
 import { SetSchema } from './schemas/SetSchema';
+import { PreferencesSchema } from './schemas/PreferencesSchema';
 
 const BaseDBModule = MongooseModule.forRootAsync({
 	imports: [ConfigModule],
@@ -34,6 +35,9 @@ const BaseDBModule = MongooseModule.forRootAsync({
 		}, {
 			name: 'Set',
 			schema: SetSchema
+		}, {
+			name: 'Preferences',
+			schema: PreferencesSchema
 		}])
 	]
 })

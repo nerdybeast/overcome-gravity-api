@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Body, UsePipes, Headers, Get, Param } from '@nestjs/common';
+import { Controller, Post, Patch, Body, UsePipes, Headers, Get, Param, Delete, HttpCode } from '@nestjs/common';
 import { Workout } from '../models/Workout';
 import { JsonApiDocumentPipe } from '../pipes/JsonApiDocumentPipe';
 import { serializeToJsonApi, createDocument2, Relationships, JsonApiDto, Document } from '../models/JsonApi';
@@ -10,6 +10,7 @@ import { MaxService } from '../max/max.service';
 import { Exercise } from '../models/Exercise';
 import { Set } from '../models/Set';
 import { Max } from '../models/Max';
+import { FullWorkout } from '../models/FullWorkout';
 
 @Controller('workouts')
 export class WorkoutsController {
@@ -29,9 +30,11 @@ export class WorkoutsController {
 
 		const exercises = await this.exerciseService.findByWorkouts(workoutIds);
 		const exerciseIds = exercises.map(exercise => exercise.id);
-		
-		const sets = await this.setsService.findByExercises(exerciseIds);
-		const maxes = await this.maxService.findByUser(userId);
+
+		const [sets, maxes] = await Promise.all([
+			this.setsService.findByExercises(exerciseIds),
+			this.maxService.findByUser(userId)
+		]);
 
 		let includedDocuments: Document[] = [];
 
@@ -81,6 +84,21 @@ export class WorkoutsController {
 	public async patch(@Body() body: RequestObject<Workout>) {
 		const workout = await this.workoutService.update(body.model);
 		return serializeToJsonApi(workout, body.type);
+	}
+
+	@Delete(':id')
+	@HttpCode(204)
+	public async delete(@Param('id') id: string) {
+
+		const fullWorkout: FullWorkout = await this.workoutService.findWithChildRecords(id);
+
+		await Promise.all([
+			this.workoutService.delete(id),
+			this.exerciseService.deleteMany(fullWorkout.exercises.map(x => x.id)),
+			this.setsService.deleteMany(fullWorkout.sets.map(x => x.id))
+		])
+
+		return;
 	}
 
 	private createWorkoutDocument(workout: Workout, exercises: Exercise[], sets: Set[], maxes: Max[]) : WorkoutDocument {

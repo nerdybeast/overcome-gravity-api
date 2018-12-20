@@ -3,12 +3,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IWorkoutDocument } from '../db/schemas/WorkoutSchema';
 import { Workout } from '../models/Workout';
+import { FullWorkout } from '../models/FullWorkout';
+import { ExerciseService } from '../exercises/ExerciseService';
+import { SetsService } from '../sets/SetsService';
+import { MaxService } from '../max/max.service';
 
 @Injectable()
 export class WorkoutService {
 
 	constructor(
-		@InjectModel('Workout') private readonly workoutModel: Model<IWorkoutDocument>
+		@InjectModel('Workout') private readonly workoutModel: Model<IWorkoutDocument>,
+		private readonly exerciseService: ExerciseService,
+		private readonly setsService: SetsService,
+		private readonly maxService: MaxService
 	) {}
 
 	public async create(userId: string, workout: Workout) : Promise<Workout> {
@@ -29,6 +36,23 @@ export class WorkoutService {
 		return workouts;
 	}
 
+	public async findWithChildRecords(id: string) : Promise<FullWorkout> {
+
+		const [ workout, exercises ] = await Promise.all([
+			this.findById(id),
+			this.exerciseService.findByWorkout(id)
+		]);
+
+		const sets = await this.setsService.findByExercises(exercises.map(exercise => exercise.id));
+
+		const fullWorkout = new FullWorkout();
+		fullWorkout.workout = workout;
+		fullWorkout.exercises = exercises;
+		fullWorkout.sets = sets;
+
+		return fullWorkout;
+	}
+
 	public async update(workout: Workout) : Promise<Workout> {
 
 		const workoutDocument = await this.workoutModel.findByIdAndUpdate(workout.id, workout, {
@@ -37,6 +61,10 @@ export class WorkoutService {
 		});
 
 		return this.fromWorkoutDocument(workoutDocument);
+	}
+
+	public async delete(workoutId: string) {
+		return await this.workoutModel.findByIdAndDelete(workoutId);
 	}
 
 	private toWorkoutDocument(userId: string, workout: Workout) : IWorkoutDocument {

@@ -10,6 +10,12 @@ export class SetsController {
 
 	constructor(private readonly setsService: SetsService) {}
 
+	@Get(':id')
+	public async get(@Param('id') id: string) {
+		const theSet = await this.setsService.findById(id);
+		return serializeToJsonApi(theSet, 'set');
+	}
+
 	@Post()
 	@UsePipes(JsonApiDocumentPipe)
 	public async create(@Body() body: RequestObject<Set>) {
