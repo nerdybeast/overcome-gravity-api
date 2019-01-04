@@ -9,6 +9,11 @@ export class MaxService {
 
 	constructor(@InjectModel('Max') private readonly maxModel: Model<IMaxDocument>) {}
 
+	public async findById(id: string) : Promise<Max> {
+		const maxDocument = await this.maxModel.findById(id);
+		return this.fromMaxDocument(maxDocument);
+	}
+
 	public async create(userId: string, max: Max): Promise<Max> {
 		const createdMax = this.toMaxDocument(userId, max);
 		const createdMaxModel = new this.maxModel(createdMax);
@@ -37,7 +42,8 @@ export class MaxService {
 			clientId: max.clientId,
 			name: max.name,
 			kg: max.kg,
-			lbs: max.lbs
+			lbs: max.lbs,
+			reps: max.reps
 		});
 	}
 
@@ -48,6 +54,7 @@ export class MaxService {
 		max.name = maxDocument.name;
 		max.kg = maxDocument.kg;
 		max.lbs = maxDocument.lbs;
+		max.reps = maxDocument.reps;
 		return max;
 	}
 }
