@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UsePipes, Patch, Headers, Get, HttpException } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, Patch, Headers, Get, HttpException, Param } from '@nestjs/common';
 import { Max } from '../models/Max';
 import { JsonApiDocumentPipe } from '../pipes/JsonApiDocumentPipe';
 import { serializeToJsonApi } from '../models/JsonApi';
@@ -18,6 +18,12 @@ export class MaxController {
 	public async getAllByUser(@Headers('userid') userId: string) {
 		const maxes = await this.maxService.findByUser(userId);
 		return serializeToJsonApi(maxes, 'max');
+	}
+
+	@Get(':id')
+	public async get(@Param('id') id: string) {
+		const max = await this.maxService.findById(id);
+		return serializeToJsonApi(max, 'max');
 	}
 
 	@Post()

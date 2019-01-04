@@ -6,7 +6,8 @@ export const MaxSchema = new mongoose.Schema({
 	clientId: String,
 	name: String,
 	kg: Number,
-	lbs: Number
+	lbs: Number,
+	reps: Number
 });
 
 export interface IMaxDocument extends IDocument {
@@ -15,4 +16,5 @@ export interface IMaxDocument extends IDocument {
 	name: string;
 	kg: number;
 	lbs: number;
+	reps: number;
 }

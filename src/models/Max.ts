@@ -5,4 +5,5 @@ export class Max extends ModelBase {
 	name: string;
 	kg: number;
 	lbs: number;
+	reps: number;
 }
