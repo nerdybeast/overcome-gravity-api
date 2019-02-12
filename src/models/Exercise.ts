@@ -9,6 +9,8 @@ export class Exercise extends ModelBase {
 	//Will be the workout id
 	workout: string;
 
-	//Will be the max id
+	/**
+	 * Will be the max id
+	 */
 	max: string;
 }
