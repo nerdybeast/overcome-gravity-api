@@ -11,7 +11,8 @@
     "test:cov": "jest --coverage",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "nodemon": "nodemon",
-    "tsc": "tsc --watch",
+    "tsc": "tsc",
+    "tsc:watch": "tsc --watch",
     "tslint": "npm run tslint:src && npm run tslint:test",
     "tslint:src": "tslint src/**/*.ts",
     "tslint:test": "tslint test/**/*.ts"
