@@ -1,11 +1,13 @@
 import Joi from 'joi';
 import { EnvironmentConfig } from 'models/EnvironmentConfig';
+import { IProcessEnvVariables } from './IProcessEnvVariables';
 
 export class ConfigService {
 
 	private readonly environmentConfig : EnvironmentConfig;
+	public static ValidationErrorPrefix: string = 'Config Validation Error';
 
-	constructor(environmentVariables) {
+	constructor(environmentVariables: IProcessEnvVariables) {
 		this.environmentConfig = this.validateEnvConfig(environmentVariables);
 	}
 
@@ -21,7 +23,7 @@ export class ConfigService {
 		return this.environmentConfig.ROLLBAR_ACCESS_TOKEN;
 	}
 
-	private validateEnvConfig(env: any) : EnvironmentConfig {
+	private validateEnvConfig(environmentVariables: IProcessEnvVariables) : EnvironmentConfig {
 
 		const envVarsSchema: Joi.ObjectSchema = Joi.object({
 			PORT: Joi.number().required(),
@@ -29,10 +31,10 @@ export class ConfigService {
 			ROLLBAR_ACCESS_TOKEN: Joi.string().required()
 		});
 
-		const { error, value: validatedEnvConfig } = Joi.validate<EnvironmentConfig>(env, envVarsSchema);
+		const { error, value: validatedEnvConfig } = Joi.validate<EnvironmentConfig>(environmentVariables as any, envVarsSchema);
 
 		if (error) {
-			throw new Error(`Config validation error: ${error.message}`);
+			throw new Error(`${ConfigService.ValidationErrorPrefix}: ${error.message}`);
 		}
 
 		return validatedEnvConfig;
