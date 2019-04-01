@@ -6,7 +6,8 @@
 	},
 	"rules": {
 		"one-variable-per-declaration": true,
-		"trailing-comma": false
+		"trailing-comma": false,
+		"no-unused-variable": true
 	},
 	"rulesDirectory": []
 }

@@ -75,7 +75,8 @@ export class WorkoutsController {
 	@Post()
 	@UsePipes(JsonApiDocumentPipe)
 	public async create(@Headers('userid') userId: string, @Body() body: RequestObject<Workout>) {
-		const workout = await this.workoutService.create(userId, body.model);
+		body.model.userId = userId;
+		const workout = await this.workoutService.create(body.model);
 		return serializeToJsonApi(workout, body.type);
 	}
 

@@ -6,34 +6,21 @@ import { Workout } from '../models/Workout';
 import { FullWorkout } from '../models/FullWorkout';
 import { ExerciseService } from '../exercises/ExerciseService';
 import { SetsService } from '../sets/SetsService';
-import { MaxService } from '../max/max.service';
+import { BaseModelService } from '../modules/database/BaseModelService';
 
 @Injectable()
-export class WorkoutService {
+export class WorkoutService extends BaseModelService<IWorkoutDocument, Workout> {
 
 	constructor(
 		@InjectModel('Workout') private readonly workoutModel: Model<IWorkoutDocument>,
 		private readonly exerciseService: ExerciseService,
-		private readonly setsService: SetsService,
-		private readonly maxService: MaxService
-	) {}
-
-	public async create(userId: string, workout: Workout) : Promise<Workout> {
-		const workoutDocument = this.toWorkoutDocument(userId, workout);
-		const createdWorkoutModel = new this.workoutModel(workoutDocument);
-		const result = await createdWorkoutModel.save();
-		return this.fromWorkoutDocument(result);
-	}
-
-	public async findById(id: string) : Promise<Workout> {
-		const workoutDocument = await this.workoutModel.findById(id);
-		return this.fromWorkoutDocument(workoutDocument);
+		private readonly setsService: SetsService
+	) {
+		super(workoutModel);
 	}
 
 	public async findByUser(userId: string) : Promise<Workout[]> {
-		const workoutDocuments = await this.workoutModel.find({ userId }).exec();
-		const workouts = workoutDocuments.map(workoutDocument => this.fromWorkoutDocument(workoutDocument));
-		return workouts;
+		return this.find({ userId });
 	}
 
 	public async findWithChildRecords(id: string) : Promise<FullWorkout> {
@@ -53,33 +40,25 @@ export class WorkoutService {
 		return fullWorkout;
 	}
 
-	public async update(workout: Workout) : Promise<Workout> {
-
-		const workoutDocument = await this.workoutModel.findByIdAndUpdate(workout.id, workout, {
-			//Returns the modified document instead of the original
-			new: true
-		});
-
-		return this.fromWorkoutDocument(workoutDocument);
-	}
-
 	public async delete(workoutId: string) {
 		return await this.workoutModel.findByIdAndDelete(workoutId);
 	}
 
-	private toWorkoutDocument(userId: string, workout: Workout) : IWorkoutDocument {
+	protected toDatabaseDocument(workout: Workout) : IWorkoutDocument {
 		return new this.workoutModel({
-			userId,
 			clientId: workout.clientId,
-			name: workout.name
+			name: workout.name,
+			userId: workout.userId
 		});
 	}
 
-	private fromWorkoutDocument(workoutDocument: IWorkoutDocument) : Workout {
+	protected fromDatabaseDocument(workoutDocument: IWorkoutDocument) : Workout {
 		const workout = new Workout();
 		workout.id = workoutDocument.id;
 		workout.clientId = workoutDocument.clientId;
 		workout.name = workoutDocument.name;
+		workout.userId = workoutDocument.userId;
+		workout.createdDate = workoutDocument.createdDate;
 		return workout;
 	}
 }
