@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from '../db/DatabaseModule';
 import { SetsController } from './sets.controller';
 import { SetsService } from './SetsService';
+import { MongooseModule } from '@nestjs/mongoose';
+import { SetSchema } from '../db/schemas/SetSchema';
 
 @Module({
 	imports: [
-		DatabaseModule
+		MongooseModule.forFeature([{
+			name: 'Set',
+			schema: SetSchema
+		}])
 	],
 	controllers: [SetsController],
 	providers: [SetsService],

@@ -13,9 +13,7 @@
     "nodemon": "nodemon",
     "tsc": "tsc",
     "tsc:watch": "tsc --watch",
-    "tslint": "npm run tslint:src && npm run tslint:test",
-    "tslint:src": "tslint src/**/*.ts",
-    "tslint:test": "tslint test/**/*.ts"
+    "lint": "tslint src/**/*.ts test/**/*.ts"
   },
   "dependencies": {
     "@nestjs/common": "^6.0.5",
