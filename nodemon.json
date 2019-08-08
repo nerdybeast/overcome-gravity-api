@@ -1,5 +1,0 @@
-{
-  "watch": ["dist"],
-  "ext": "js",
-  "exec": "node --inspect=5959 dist/local-dev.js"
-}
